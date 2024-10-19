@@ -1,0 +1,30 @@
+    <div class="container mt-5">
+        <h1>Crear Nuevo Carrito</h1>
+        <form id="createCartForm">
+            <button type="submit" class="btn btn-primary">Crear Carrito</button>
+        </form>
+        <div id="message" class="mt-3"></div>
+    </div>
+
+    <script>
+        document.getElementById('createCartForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            try {
+                const response = await fetch('/api/carts', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('message').innerText = `Carrito creado con ID: ${data._id}`;
+                } else {
+                    document.getElementById('message').innerText = 'Error al crear el carrito';
+                }
+            } catch (error) {
+                console.error('Error al crear el carrito:', error);
+                document.getElementById('message').innerText = 'Error al crear el carrito';
+            }
+        });
+    </script>

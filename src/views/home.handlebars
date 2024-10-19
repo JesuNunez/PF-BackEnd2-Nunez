@@ -1,0 +1,28 @@
+<div style="text-align: center; margin-top: 50px;">
+    <h1 style="font-family: Arial, sans-serif; color: #333;">Menú Principal</h1>
+    <ul style="list-style-type: none; padding-left: 0%; margin: 20px auto; max-width: 300px;">
+        <li style="margin-bottom: 10px;">
+            <a href="/products" style="text-decoration: none; color: white; background-color: #007BFF; padding: 10px 20px; border-radius: 5px; display: inline-block;">Ver Productos</a>
+        </li>
+        <li style="margin-bottom: 10px;">
+            <a href="/listCarts" style="text-decoration: none; color: white; background-color: #28a745; padding: 10px 20px; border-radius: 5px; display: inline-block;">Ver Carritos</a>
+        </li>
+        <li style="margin-bottom: 10px;">
+            <a href="/realtimeproducts" style="text-decoration: none; color: white; background-color: #ffc107; padding: 10px 20px; border-radius: 5px; display: inline-block;">Agregar Productos</a>
+        </li>
+        <li style="margin-bottom: 10px;">
+            <a href="/deleteproducts" style="text-decoration: none; color: white; background-color: #dc3545; padding: 10px 20px; border-radius: 5px; display: inline-block;">Eliminar Productos</a>
+        </li>
+    </ul>
+</div>
+
+<h2 style="font-family: Arial, sans-serif; text-align: center; color: #666;">Bienvenido, {{user.first_name}} {{user.last_name}}!! </h2>
+<h3 style="font-family: Arial, sans-serif; text-align: center; color: #666;">Rol: {{user.role}}</h3>
+
+<div style="text-align: center; margin-top: 20px;">
+    <form action="/api/sessions/logout" method="POST">
+        <button type="submit" style="background-color: #ff4d4d; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+            Logout
+        </button>
+    </form>
+</div>

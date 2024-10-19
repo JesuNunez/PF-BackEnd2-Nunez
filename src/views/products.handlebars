@@ -1,0 +1,90 @@
+<a href="/listCarts" style="background-color: #0e71db; padding:10px 20px; color: white; border-radius: 5px; text-decoration: none;">Ver Carrito</a>
+
+<h1 class="title" style="text-align: center; font-family: Arial, sans-serif; color: #333; margin-top: 20px;">Todos los productos</h1>
+
+<input type="hidden" id="carritoId" value="{{cartId}}" />
+
+<div class="card-deck" style="display: flex; flex-wrap: wrap; justify-content: space-between; margin: 20px;">
+    {{#each productos}}
+    <div class="card" style="border: 1px solid #ddd; border-radius: 5px; padding: 15px; width: 30%; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+        <div class="card-body">
+            <h3 class="card-title" style="font-family: Arial, sans-serif; color: #007BFF;">{{title}}</h3>
+            <h6 hidden class="card-title">{{_id}}</h6>
+            <h4 style="color: #666;">{{description}}</h4>
+            <h4 class="card-text" style="color: #555;">Categoría: {{category}}</h4>
+            <h4 class="card-text" style="color: #28a745;">$ {{price}}</h4>
+            <button class="add-to-cart" onclick="openModal('{{_id}}')" style="background-color: #007BFF; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Agregar al carrito</button>
+        </div>
+    </div>
+    {{/each}}
+</div>
+
+<div class="botonera" style="text-align: center; margin-top: 20px;">
+    {{#if hasPrevPage}}
+    <button style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <a href="/products?page={{prevPage}}" style="text-decoration: none; color: white;"> Anterior </a>
+    </button>
+    {{/if}}
+
+    {{#if hasNextPage}}
+    <button style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <a href="/products?page={{nextPage}}" style="text-decoration: none; color: white;"> Siguiente </a>
+    </button>
+    {{/if}}
+    
+    <div style="margin-top: 10px;">
+        <p><strong>Página </strong> {{currentPage}} <strong>de </strong> {{totalPages}} </p>
+    </div>
+</div>
+
+<div id="myModal" class="modal" style="display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);">
+    <div class="modal-content" style="background-color: white; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 10px;">
+        <span class="close" onclick="closeModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold;">&times;</span>
+        <div class="modal-header" style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">Agregar productos al carrito</div>
+        <div class="modal-body">
+            <input type="hidden" id="productId" />
+            <label for="cantidad" style="font-size: 18px; margin-right: 10px;">Cantidad:</label>
+            <input type="number" class="form-control" style="padding: 5px; width: 100px;" placeholder="Ingrese la cantidad" id="cantidad" name="cantidad" min="1" />
+        </div>
+        <div class="modal-footer" style="text-align: right; margin-top: 20px;">
+            <button type="submit" onclick="addToCart()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Agregar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(productId) { 
+        document.getElementById('productId').value = productId; 
+        document.getElementById("myModal").style.display = "block"; 
+    } 
+    function closeModal() { 
+        document.getElementById("myModal").style.display = "none"; 
+    } 
+    async function addToCart() { 
+        const productId = document.getElementById('productId').value; 
+        const carritoId = document.getElementById('carritoId').value; 
+        const cantidad = document.getElementById('cantidad').value; 
+        try { 
+            const response = await fetch(`/api/carts/${carritoId}/product/${productId}`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ quantity: cantidad }) 
+            }); 
+            const result = await response.json(); 
+            if (response.ok) { 
+                alert('Producto agregado al carrito exitosamente'); 
+                closeModal(); 
+            } else { 
+                alert(result.error || 'Error al agregar el producto al carrito'); 
+            } 
+        } catch (error) { 
+            console.error('Error:', error); 
+            alert('Error al agregar el producto al carrito'); 
+        } 
+    }
+    window.onclick = function(event) { 
+        if (event.target == document.getElementById("myModal")) { 
+            closeModal(); 
+        } 
+    }
+</script>

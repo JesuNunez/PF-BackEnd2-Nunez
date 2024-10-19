@@ -1,0 +1,158 @@
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h1>Mi carrito</h1>
+        <h2 id="precioTotal"></h2>
+    </div>
+    <input hidden id="idCarrito" value="{{cartId}}"></input>
+    <div id="carritos" class="productos-container"></div>
+    <div id="volverRutas" class="my-4"></div>
+    <div id="generarTicket" class="my-4"></div>
+</div>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+    }
+    h1 {
+        font-size: 2rem;
+        color: #343a40;
+    }
+    h2 {
+        color: #007bff;
+    }
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 15px;
+    }
+    .card-header {
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+    }
+    .card-body {
+        padding: 10px;
+        background-color: white;
+    }
+    .btn {
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        font-size: 14px;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+    .my-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+    .my-4 {
+        margin-top: 2rem !important;
+        margin-bottom: 2rem !important;
+    }
+    #precioTotal {
+        font-weight: bold;
+        color: #28a745;
+    }
+</style>
+
+<script>
+    const cartId = document.getElementById("idCarrito").value;
+
+    async function cargarCarrito(cartId) {
+        try {
+            const response = await fetch(`/api/carts/${cartId}`);
+            
+            if (!response.ok) {
+                throw new Error('Error al obtener el carrito');
+            }
+
+            const carrito = await response.json();
+
+            const contenedorCarritos = document.getElementById('carritos');
+            contenedorCarritos.innerHTML = ''; 
+
+            let precioTotal = 0;
+
+            carrito.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                precioTotal += itemTotal;
+
+                const productoDiv = document.createElement('div');
+                productoDiv.classList.add('card', 'my-3');
+                productoDiv.innerHTML = `
+                    <div class="card-header">
+                        Producto: ${item.product.title}
+                    </div>
+                    <div class="card-body">
+                        <p>Precio unitario: $${item.product.price}</p>
+                        <p>Cantidad: ${item.quantity}</p>
+                        <p>Total: $${itemTotal}</p>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarDelCarrito('${cartId}', '${item.product._id}')">Eliminar</button>
+                    </div>
+                `;
+
+                contenedorCarritos.appendChild(productoDiv);
+            });
+
+            document.getElementById('precioTotal').innerText = `Precio total: $${precioTotal}`;
+
+            const volverRutasDiv = document.getElementById('volverRutas');
+            volverRutasDiv.innerHTML = `
+                <button class="btn btn-primary" onclick="window.location.href='/products'">Sección de Productos</button>
+            `;
+
+            const generarTicketDiv = document.getElementById('generarTicket');
+            generarTicketDiv.innerHTML = `
+                <button class="btn btn-primary" onclick="window.location.href='/api/carts/${cartId}/purchase'">Generar ticket</button>
+            `;
+
+        } catch (error) {
+            console.error('Error al cargar el carrito:', error);
+        }
+    }
+
+    async function eliminarDelCarrito(cartId, productId) {
+        try {
+            const response = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Producto eliminado del carrito exitosamente');
+                cargarCarrito(cartId); 
+            } else {
+                alert('Error al eliminar producto del carrito');
+                console.error(result);
+            }
+        } catch (error) {
+            console.error('Error al eliminar producto del carrito:', error);
+            alert('Error al eliminar producto del carrito');
+        }
+    }
+
+    cargarCarrito(cartId);
+</script>
