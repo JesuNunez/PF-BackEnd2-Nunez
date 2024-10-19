@@ -5,6 +5,7 @@ import CartManager from "../dao/db/cart-manager-db.js";
 import passport from "passport";
 const productManager = new ProductManager();
 const cartManager = new CartManager();
+import { soloAdmin, soloUser } from "../middleware/auth.js";
 
 // Ruta para el formulario de login:
 router.get("/login", (req, res) => {
@@ -32,10 +33,7 @@ router.get("/profile", passport.authenticate("jwt", { session: false }), (req, r
         user: req.user,
     });
 });
-//Me traigo los Middleware de auth:
-import { soloAdmin, soloUser } from "../middleware/auth.js";
 
-// Enviamos al usuario a la vista de Productos:
 router.get("/products", passport.authenticate("jwt", { session: false }), soloUser, async (req, res) => {
     try {
         const { page = 1, limit = 2 } = req.query;
@@ -76,11 +74,6 @@ router.get("/products", passport.authenticate("jwt", { session: false }), (req, 
 router.get("/realtimeproducts", passport.authenticate("jwt", { session: false }), soloAdmin, (req, res) => {
     res.render("realtimeproducts");
 });
-
-// Ruta para obtener productos en tiempo real:
-//router.get("/realtimeproducts", async (req, res) => {
-//    res.render("realtimeproducts");
-//});
 
 // Ruta para eliminar productos:
 router.get("/deleteProducts", (req, res) => {
